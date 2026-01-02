@@ -9,21 +9,6 @@
 
 ---
 
-1. [Project summary](#project-summary)
-2. [Quick start (download & run)](#quick-start-download--run)
-3. [Architecture (diagram + explanation)](#architecture-diagram--explanation)
-4. [File structure (updated)](#file-structure-updated)
-5. [Model cards & paths](#model-cards--paths)
-6. [Backend API reference (endpoints)](#backend-api-reference-endpoints)
-7. [Important modules & how they interact](#important-modules--how-they-interact)
-8. [Distractor model integration details](#distractor-model-integration-details)
-9. [Deployment & production notes](#deployment--production-notes)
-10. [Troubleshooting & FAQs](#troubleshooting--faqs)
-11. [Development notes & contribution](#development-notes--contribution)
-12. [Appendices](#appendices)
-
----
-
 ## 📌 Project Summary
 
 **SmartQGen (Smart AI MCQ Generator)** is a full-stack, transformer-driven system that converts educational content (PDF, DOCX, TXT) into high-quality multiple-choice quizzes.
@@ -32,28 +17,42 @@
 - Transformer-based **question generation** (T5-small + LoRA)
 - Accurate **answer extraction** (DistilBERT QA)
 - Plausible **distractor generation** (T5-based or heuristic fallback)
-- Difficulty & Bloom’s taxonomy tagging
+- Difficulty & Bloom’s Taxonomy tagging
 - Explanations for answers
 - Export quizzes and results to **PDF / DOCX**
 - Modular, production-ready **FastAPI backend**
 
-This project is the **implementation of an IEEE conference paper** titled:
+This project is the **practical implementation of an IEEE conference paper** titled:
 
 > *Smart AI MCQ Generator: A Transformer-Driven System for Automated Question, Answer, and Distractor Generation*
 
 ---
 
-## Quick start (download & run)
+## 📑 Table of Contents
 
-> These commands assume you have cloned the repo and are in the `project/backend` folder.
+1. [Quick Start](#quick-start)
+2. [Models](#models)
+3. [Architecture](#architecture)
+4. [File Structure](#file-structure)
+5. [Model Cards & Paths](#model-cards--paths)
+6. [Backend API Reference](#backend-api-reference)
+7. [Important Modules](#important-modules--how-they-interact)
+8. [Distractor Model Integration](#distractor-model-integration-details)
+9. [Appendices](#appendices)
 
-### 1) Create Python virtual environment
+---
+
+## 🚀 Quick Start
+
+> Assumes you have cloned the repository and are inside the `backend/` directory.
+
+### 1️⃣ Create Python virtual environment
 
 ```bash
 python -m venv venv
-# windows
+# Windows
 venv\Scripts\activate
-# mac/linux
+# macOS / Linux
 source venv/bin/activate
 ```
 
@@ -65,7 +64,28 @@ pip install -r requirements.txt
 pip install sentencepiece
 ```
 
-### 3) Place models in `MCQ_MODEL_Check/` (root within backend)
+### 3) Start backend
+
+```bash
+cd backend
+source venv/bin/activate
+uvicorn main:app --reload
+```
+
+Access the UI at `http://localhost:5173` (frontend) and backend at `http://127.0.0.1:8000`.
+
+---
+
+## 🧠 Models
+
+⚠️ Trained transformer models are **not included** in this repository due to size constraints.
+
+You can:
+- Download pretrained models from Hugging Face
+- Fine-tune models using your own datasets
+- Place models locally under `backend/MCQ_MODEL_Check/`
+
+Model paths are configurable in the backend.
 
 ```
 MCQ_MODEL_Check/
@@ -87,18 +107,6 @@ MCQ_MODEL_Check/
 ```
 
 > **Important:** `local_files_only=True` is used when loading models from local paths. Ensure the directory names match exactly (case-sensitive on Linux/mac).
-
-### 4) Start backend
-
-```bash
-cd backend
-source venv/bin/activate
-uvicorn main:app --reload
-```
-
-Access the UI at `http://localhost:5173` (frontend) and backend at `http://127.0.0.1:8000`.
-
----
 
 ## Architecture — diagram + explanation
 
@@ -126,7 +134,7 @@ flowchart LR
 
 ---
 
-## File structure (updated)
+## File structure
 
 ```
 project/
@@ -154,7 +162,7 @@ project/
 │   │   └── ResultsDisplay.tsx
 │   ├── services/
 │   │   └── api.ts           # API client
-│   └── config/
+│   └── config/ 
 │       └── supabase.ts      # Supabase config
 │
 ├── .env                      # Environment variables
@@ -168,7 +176,7 @@ project/
 
 ## Model cards & paths
 
-This project uses three model types. Place the files under `backend/MCQ_MODEL_Check/`.
+This project uses three model types.
 
 ### 1) Question Generation (QG)
 - **Model**: `t5-small + LoRA (merged)`
@@ -304,65 +312,7 @@ class DistractorGenerator:
 - Save `distractor_generator.py` into `backend/modules/` next to `question_generator.py`.
 - Make sure `backend/modules/__init__.py` exists, so you can import as `from modules.distractor_generator import DistractorGenerator`.
 
-### Troubleshooting loading local model
-
-- If `transformers` complains `does not appear to have a file named config.json`, verify you saved merged model as full `save_pretrained()` style. For LoRA adapters, you must merge weights to produce a proper `config.json` + `pytorch_model.bin` / `model.safetensors`.
-- For LoRA adapter files (adapter_model.safetensors + adapter_config.json + added_tokens.json), either use PEFT `PeftModel.from_pretrained()` with correct paths **or** run the merge script to produce a single merged model folder with `config.json` and `model.safetensors`.
-
----
-
-## Deployment & production notes
-
-- Use Gunicorn + Uvicorn workers (or `uvicorn --workers`) behind Nginx for production.
-- Use Redis for caching extracted text & generated questions to avoid repeated model inference.
-- Consider quantizing models (ONNX / bitsandbytes) if GPU memory is limited.
-- For large-scale usage: host models on a model server (e.g., Triton or Hugging Face Inference) and call over HTTP.
-
----
-
-## Troubleshooting & FAQs
-
-**Q: `Repo id must be in the form 'namespace/repo_name'` error when loading local models**  
-A: This happens when `transformers` attempts to treat your string as an HF hub id. Use `local_files_only=True` when loading locally or pass absolute `Path` objects.
-
-**Q: `Can't find adapter_config.json` when using PEFT/LoRA**  
-A: Either authenticate to HF if the adapter exists on a private repo, or point to a local folder that contains `adapter_config.json` and `adapter_model.safetensors`. If you prefer to avoid runtime PEFT merging, create a merged model with `PeftModel.merge_and_unload()` or a dedicated merge script and save the merged weights with `save_pretrained()`.
-
-**Q: CPU-only env — model too slow**  
-A: Use smaller batch sizes, use `do_sample=False`, lower `num_beams`, or run the app on a machine with GPU.
-
----
-
-## Development notes & contribution
-
-- Use `black` for formatting and `ruff`/`flake8` for linting.  
-- Add unit tests for `file_processor` (parsing edge-case PDFs) and `distractor_generator` outputs.
-- When adding new models, create thorough `MODEL_CARD_*.md` describing training data and tokenization.
-
----
-
 ## Appendices
-
-### Example: correct `question_generator` model-loading snippet (final)
-
-```py
-# question_generator.py
-from transformers import T5ForConditionalGeneration, T5Tokenizer, pipeline
-import torch
-
-self.t5_model_name = "MCQ_MODEL_Check/qg_merged"
-self.device = 0 if torch.cuda.is_available() else -1
-try:
-    self.t5_tokenizer = T5Tokenizer.from_pretrained(self.t5_model_name, local_files_only=True)
-    self.t5_model = T5ForConditionalGeneration.from_pretrained(self.t5_model_name, local_files_only=True)
-    if self.device >= 0:
-        self.t5_model = self.t5_model.to(f"cuda:{self.device}")
-except Exception as e:
-    # fallback
-    self.t5_model_name = "t5-small"
-    self.t5_tokenizer = T5Tokenizer.from_pretrained(self.t5_model_name)
-    self.t5_model = T5ForConditionalGeneration.from_pretrained(self.t5_model_name)
-```
 
 ### Checklist before running locally
 
@@ -378,6 +328,4 @@ except Exception as e:
 
 Built with ❤️ by the Smart AI MCQ Team.  
 ---
-
-*End of documentation.*
 
