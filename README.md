@@ -326,6 +326,6 @@ class DistractorGenerator:
 
 ## Contact & credits
 
-Built with ❤️ by the Smart AI MCQ Team.  
+Built with ❤️ by the SmartQGen Team.  
 ---
 
