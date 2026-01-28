@@ -1,4 +1,4 @@
-# SmartQGen – Smart AI MCQ Generator
+# 🚀 QuickQuiz-AI — Smart AI MCQ Generator
 
 **Version:** 1.0.0  
 
@@ -7,24 +7,37 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-Backend-teal.svg)]()
 [![React](https://img.shields.io/badge/React-Frontend-blue.svg)]()
 
+--- 
+
+## 📌 Project Overview
+
+**QuickQuiz-AI** is an advanced **AI-powered Multiple Choice Question (MCQ) generation system** that automatically converts educational content into high-quality quizzes.
+
+The system leverages **Transformer-based deep learning models** to generate:
+
+- Intelligent questions  
+- Accurate answers  
+- Meaningful distractors  
+- Difficulty classification  
+- Bloom’s Taxonomy mapping  
+
+QuickQuiz-AI significantly reduces manual effort in assessment creation and provides a scalable solution for **online education, examinations, and learning analytics**.
+
 ---
 
-## 📌 Project Summary
+## 🎯 Key Features
 
-**SmartQGen (Smart AI MCQ Generator)** is a full-stack, transformer-driven system that converts educational content (PDF, DOCX, TXT) into high-quality multiple-choice quizzes.
-
-### Key Capabilities
-- Transformer-based **question generation** (T5-small + LoRA)
-- Accurate **answer extraction** (DistilBERT QA)
-- Plausible **distractor generation** (T5-based or heuristic fallback)
-- Difficulty & Bloom’s Taxonomy tagging
-- Explanations for answers
-- Export quizzes and results to **PDF / DOCX**
-- Modular, production-ready **FastAPI backend**
-
-This project is the **practical implementation of an IEEE conference paper** titled:
-
-> *Smart AI MCQ Generator: A Transformer-Driven System for Automated Question, Answer, and Distractor Generation*
+✅ Upload educational content (PDF, DOCX, TXT)  
+✅ Automatic question generation using **Transformer models**  
+✅ Context-aware answer extraction  
+✅ Intelligent distractor generation  
+✅ Difficulty-level classification (Easy / Medium / Hard)  
+✅ Bloom’s Taxonomy tagging  
+✅ Explanation generation for answers  
+✅ Quiz evaluation and scoring  
+✅ Export results to **PDF and DOCX**  
+✅ Modular and production-ready backend  
+✅ Modern React frontend interface  
 
 ---
 
@@ -324,8 +337,9 @@ class DistractorGenerator:
 
 ---
 
-## Contact & credits
+## 👨‍💻 Author
 
-Built with ❤️ by the SmartQGen Team.  
+Developed with ❤️ as an AI/ML Final Year Project
+Project Name: QuickQuiz-AI — Smart MCQ Generator
 ---
 
